@@ -11,11 +11,17 @@ Aplicação web desenvolvida como parte do processo seletivo da AutoU. A soluç�
 
 ## 🚀 Funcionalidades Principais
 
-* **Análise Inteligente de E-mails:** O usuário pode colar o conteúdo de qualquer e-mail para análise.
-* **Classificação Automática:** A IA classifica o e-mail em categorias úteis (ex: `Solicitação Urgente`, `Dúvida Técnica`, `Comercial`).
-* **Sugestão de Resposta:** Para cada e-mail, uma resposta profissional e contextualizada é gerada automaticamente.
-* **Priorização:** O sistema atribui um nível de prioridade (`Alta`, `Média`, `Baixa`) para ajudar na organização.
-* **Interface Limpa e Intuitiva:** O design foca na simplicidade e na experiência do usuário.
+* **Análise de E-mail com Gemini:** Utiliza a poderosa IA do Google para uma análise profunda do conteúdo dos e-mails.
+* **Classificação Multicritério:** Vai além do básico, categorizando e-mails por:
+    * **Conteúdo:** `Solicitação Urgente`, `Dúvida Técnica`, `Comercial`, etc.
+    * **Prioridade:** `Alta`, `Média` ou `Baixa`, para organização imediata.
+    * **Sentimento:** Detecta se o tom do e-mail é `Positivo 😊`, `Neutro 😐` ou `Negativo 😠`, permitindo uma triagem mais inteligente.
+* **Geração de Respostas Contextuais:** Sugere uma resposta profissional e adequada, baseada no conteúdo e sentimento do e-mail.
+* **Interface Avançada e Focada em UX:** Projetada para ser eficiente e agradável de usar:
+    * **Temas Claro e Escuro (Dark Mode):** Para conforto visual em qualquer ambiente, com a preferência salva no navegador.
+    * **Botão "Copiar Resposta":** Aumenta a produtividade permitindo copiar a sugestão com um clique.
+    * **E-mails de Exemplo:** Facilita a demonstração e o teste rápido das capacidades da IA.
+    * **Design Responsivo e Moderno:** Com animações suaves e feedback visual claro para o usuário.
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -28,7 +34,7 @@ Este projeto foi construído utilizando as seguintes tecnologias:
     * **Gunicorn:** Servidor WSGI para produção.
 * **Frontend:**
     * **HTML5:** Estrutura da página.
-    * **CSS3:** Estilização e design.
+    * **CSS3:** Estilização e design (incluindo variáveis de CSS para temas).
     * **JavaScript (Vanilla):** Interatividade e comunicação com o backend (via `fetch` API).
 * **Hospedagem:**
     * **Render:** Plataforma de nuvem para o deploy da aplicação.
@@ -83,4 +89,4 @@ Siga os passos abaixo para rodar a aplicação na sua máquina.
 
 ---
 
-Desenvolvido por **[Seu Nome Completo aqui]**.
+Desenvolvido por **Guilherme Lucas Teixeira**.
