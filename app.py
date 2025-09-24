@@ -1,33 +1,56 @@
 import os
-import requests
+import json
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import google.generativeai as genai
 
-# Carrega as variáveis de ambiente do arquivo .env
+# Carrega as variáveis de ambiente
 load_dotenv()
 
-# Inicializa o aplicativo Flask
+# Inicializa o Flask
 app = Flask(__name__)
-# Habilita o CORS para permitir requisições do frontend
 CORS(app)
 
-# --- CONFIGURAÇÃO DA API HUGGING FACE ---
-API_TOKEN = os.getenv("HF_API_TOKEN")
-API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli"
-headers = {"Authorization": f"Bearer {API_TOKEN}"}
+# --- CONFIGURAÇÃO DA API GEMINI ---
+try:
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-1.5-flash-latest') # Usando um modelo mais recente e rápido
+except Exception as e:
+    print(f"Erro ao configurar a API Gemini: {e}")
+    model = None
 
-def query_huggingface_api(payload):
-    """Função para consultar a API de inferência do Hugging Face."""
-    response = requests.post(API_URL, headers=headers, json=payload)
-    # Lança um erro se a requisição falhar
-    response.raise_for_status()
-    return response.json()
+# --- PROMPT ESTRUTURADO PARA O GEMINI ---
+# Este prompt é a nova "inteligência" do nosso app.
+# Ele instrui o Gemini a agir como um assistente e retornar um JSON.
+PROMPT_TEMPLATE = """
+Analise o seguinte e-mail e retorne um objeto JSON com a seguinte estrutura:
+{{
+  "classification": "...",
+  "summary": "...",
+  "suggested_response": "...",
+  "priority": "..."
+}}
 
-# Define a rota principal da nossa API
+- "classification": Classifique o e-mail em uma das seguintes categorias: 'Solicitação Urgente', 'Dúvida Técnica', 'Comercial', 'Feedback', 'Agradecimento', 'Outros'.
+- "summary": Um resumo de uma frase do conteúdo do e-mail.
+- "suggested_response": Uma resposta adequada e profissional, em português, baseada no conteúdo do e-mail.
+- "priority": A prioridade da resposta, classificada como 'Alta', 'Média' ou 'Baixa'.
+
+Não inclua ```json ou ``` no início ou no fim da sua resposta. Responda apenas com o JSON.
+
+E-mail para análise:
+---
+{email_text}
+---
+"""
+
 @app.route('/classify', methods=['POST'])
 def classify_email_route():
-    """Recebe o texto do e-mail, classifica e sugere uma resposta."""
+    if not model:
+        return jsonify({"error": "Modelo de IA não foi inicializado corretamente."}), 500
+        
     data = request.get_json()
     if not data or 'email_text' not in data:
         return jsonify({"error": "O texto do e-mail ('email_text') é obrigatório."}), 400
@@ -35,45 +58,26 @@ def classify_email_route():
     email_text = data['email_text']
 
     try:
-        # --- Lógica de Classificação ---
-        api_payload = {
-            "inputs": email_text,
-            "parameters": {"candidate_labels": ["Produtivo", "Improdutivo"]},
-        }
-        api_result = query_huggingface_api(api_payload)
-
-        # Lógica para encontrar a melhor classificação (como discutimos)
-        scores = api_result.get('scores', [])
-        labels = api_result.get('labels', [])
-
-        if not scores or not labels:
-             return jsonify({"error": "Resposta inesperada da API de IA."}), 500
-
-        highest_score_index = scores.index(max(scores))
-        classification = labels[highest_score_index]
-
-        # --- Lógica Simples para Sugerir Resposta (Placeholder) ---
-        suggested_response = ""
-        if classification == "Produtivo":
-            suggested_response = "Obrigado pelo seu e-mail. Estamos analisando sua solicitação e retornaremos em breve."
-        else: # Improdutivo
-            suggested_response = "Agradecemos o contato. Sua mensagem foi recebida."
-
-        # Monta a resposta final
-        response_data = {
-            "classification": classification,
-            "suggested_response": suggested_response
-        }
-
+        # Formata o prompt com o e-mail recebido
+        full_prompt = PROMPT_TEMPLATE.format(email_text=email_text)
+        
+        # Chama a API do Gemini
+        response = model.generate_content(full_prompt)
+        
+        # O Gemini retorna um texto que esperamos ser um JSON. Vamos convertê-lo.
+        # Adicionamos um bloco de segurança para caso a resposta não seja um JSON válido.
+        try:
+            # Limpa a resposta de possíveis marcações de código que o LLM pode adicionar
+            cleaned_response = response.text.strip().replace('```json', '').replace('```', '')
+            response_data = json.loads(cleaned_response)
+        except (json.JSONDecodeError, AttributeError) as e:
+            print(f"Alerta: A resposta da IA não foi um JSON válido. Resposta recebida: {response.text}")
+            return jsonify({"error": f"A resposta da IA não pôde ser processada. Detalhes: {e}"}), 500
+            
         return jsonify(response_data)
 
-    except requests.exceptions.RequestException as e:
-        # Captura erros de conexão com a API
-        return jsonify({"error": f"Erro ao contatar a API de IA: {e}"}), 503
     except Exception as e:
-        # Captura outros erros inesperados
-        return jsonify({"error": f"Ocorreu um erro interno: {e}"}), 500
+        return jsonify({"error": f"Ocorreu um erro ao processar com a IA: {e}"}), 500
 
-# Permite rodar o servidor diretamente com "python app.py"
 if __name__ == '__main__':
     app.run(debug=True)

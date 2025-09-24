@@ -81,3 +81,15 @@ button:hover {
 .hidden {
     display: none;
 }
+
+.tag {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.tag-alta { background-color: #d92d20; }
+.tag-média { background-color: #f79009; }
+.tag-baixa { background-color: #027a48; }

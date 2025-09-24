@@ -57,7 +57,19 @@ classifyBtn.addEventListener('click', async () => {
 });
 
 function displayResults(data) {
-    classificationResult.textContent = data.classification;
-    suggestedResponse.textContent = data.suggested_response;
-    resultsContainer.classList.remove('hidden'); // Mostra o container de resultados
+    // Agora 'data' tem os campos: classification, summary, suggested_response, priority
+    
+    // Atualiza o HTML com os novos dados
+    classificationResult.innerHTML = `
+        <span class="tag tag-${data.priority.toLowerCase()}">${data.priority}</span> ${data.classification}
+    `;
+    
+    // Adicionamos um novo campo para o resumo
+    suggestedResponse.innerHTML = `
+        <strong>Resumo:</strong> ${data.summary}<br><br>
+        <strong>Sugestão de Resposta:</strong><br>
+        ${data.suggested_response.replace(/\n/g, '<br>')}
+    `;
+    
+    resultsContainer.classList.remove('hidden');
 }
