@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
+from flask import Flask, request, jsonify, send_from_directory
 
 # Carrega as variáveis de ambiente
 load_dotenv()
@@ -11,6 +12,8 @@ load_dotenv()
 # Inicializa o Flask
 app = Flask(__name__)
 CORS(app)
+
+
 
 # --- CONFIGURAÇÃO DA API GEMINI ---
 try:
@@ -45,6 +48,15 @@ E-mail para análise:
 {email_text}
 ---
 """
+
+# Rota para servir o frontend (o arquivo index.html e outros arquivos estáticos)
+@app.route('/')
+def serve_frontend():
+    return send_from_directory('static', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static_files(path):
+    return send_from_directory('static', path)
 
 @app.route('/classify', methods=['POST'])
 def classify_email_route():
