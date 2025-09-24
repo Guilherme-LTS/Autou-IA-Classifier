@@ -6,7 +6,7 @@ const classificationResult = document.getElementById('classification-result');
 const suggestedResponse = document.getElementById('suggested-response');
 
 // URL da nossa API Flask que está rodando localmente
-const API_URL = 'http://127.0.0.1:5000/classify';
+const API_URL = '/classify'; 
 
 // 2. Adiciona um "escutador de eventos" ao botão de classificar
 classifyBtn.addEventListener('click', async () => {
