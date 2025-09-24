@@ -250,23 +250,49 @@ textarea:not(:placeholder-shown) + #clear-btn {
     top: 20px;
     right: 20px;
 }
+
 #theme-toggle-btn {
     background: var(--card-bg-color);
     border: 1px solid var(--border-color);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     color: var(--subtitle-color);
+    position: relative;
+    overflow: hidden; /* Garante que os ícones não "escapem" durante a animação */
+    transition: background-color 0.3s, border-color 0.3s;
 }
-#theme-toggle-btn svg { width: 20px; height: 20px; }
-body.dark-mode #theme-icon-sun { display: block; }
-body.dark-mode #theme-icon-moon { display: none; }
-body:not(.dark-mode) #theme-icon-sun { display: none; }
-body:not(.dark-mode) #theme-icon-moon { display: block; }
+
+#theme-toggle-btn svg {
+    width: 24px;
+    height: 24px;
+    position: absolute; /* Posiciona os dois ícones um sobre o outro */
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+/* Estado Inicial (Tema Claro) */
+#theme-icon-sun {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+#theme-icon-moon {
+    opacity: 0;
+    transform: rotate(-90deg);
+}
+
+/* Estado Final (Tema Escuro) */
+body.dark-mode #theme-icon-sun {
+    opacity: 0;
+    transform: rotate(90deg);
+}
+body.dark-mode #theme-icon-moon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
 
 /* Notification Toast */
 #notification {
