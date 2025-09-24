@@ -3,30 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoU - Classificador de E-mails</title>
+    <title>AutoU - Classificador de E-mails com IA</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="theme-switcher">
+        <button id="theme-toggle-btn">
+            <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.061 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.894 17.894a.75.75 0 01-1.06 0l-1.59-1.591a.75.75 0 111.06-1.06l1.59 1.59a.75.75 0 010 1.06zM12 18.75a.75.75 0 01-.75.75v2.25a.75.75 0 011.5 0v-2.25a.75.75 0 01-.75-.75zM5.106 17.894a.75.75 0 010-1.06l1.59-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM2.25 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3a.75.75 0 01-.75-.75zM6.106 5.106a.75.75 0 011.06 0l1.591 1.59a.75.75 0 01-1.06 1.06l-1.59-1.591a.75.75 0 010-1.06z"></path></svg>
+            <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.69a.75.75 0 01.981.981A10.503 10.503 0 0118 21a10.5 10.5 0 01-10.5-10.5c0-4.368 2.667-8.112 6.46-9.672a.75.75 0 01.818.162z" clip-rule="evenodd"></path></svg>
+        </button>
+    </div>
+
     <div class="container">
         <h1>🤖 Classificador de E-mails com IA</h1>
-        <p class="subtitle">Cole o texto de um e-mail abaixo para classificá-lo como produtivo ou improdutivo e receber uma sugestão de resposta.</p>
+        <p class="subtitle">Analise e-mails com o poder do Gemini. Cole um texto ou use um dos nossos exemplos.</p>
 
+        <div class="example-buttons">
+            <button class="example-btn" data-example="urgent">Solicitação Urgente</button>
+            <button class="example-btn" data-example="thanks">Agradecimento</button>
+            <button class="example-btn" data-example="spam">Spam</button>
+        </div>
+        
         <div class="form-group">
             <textarea id="email-input" rows="10" placeholder="Cole o conteúdo do e-mail aqui..."></textarea>
+            <button id="clear-btn">Limpar</button>
         </div>
-
-        <button id="classify-btn">Classificar E-mail</button>
-
-        <div id="results-container" class="hidden">
-            <h2>Resultado da Análise</h2>
-            <p><strong>Classificação:</strong> <span id="classification-result"></span></p>
-            <h3>Sugestão de Resposta:</h3>
-            <p id="suggested-response"></p>
+        
+        <button id="classify-btn">
+            <span class="btn-text">Classificar E-mail</span>
+            <div class="spinner hidden"></div>
+        </button>
+        
+        <div id="results-container">
+            <div class="result-header">
+                <h2>Resultado da Análise</h2>
+                <button id="copy-btn" title="Copiar Resposta">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3.5A1.5 1.5 0 018.5 2h3.879a1.5 1.5 0 011.06.44l3.122 3.121A1.5 1.5 0 0117 6.621V16.5a1.5 1.5 0 01-1.5 1.5h-8A1.5 1.5 0 016 16.5v-13z"></path><path d="M5 6.5A1.5 1.5 0 016.5 5h3a.5.5 0 000-1h-3A2.5 2.5 0 004 6.5v10A2.5 2.5 0 006.5 19h7A2.5 2.5 0 0016 16.5v-3a.5.5 0 00-1 0v3a1.5 1.5 0 01-1.5 1.5h-7A1.5 1.5 0 015 16.5v-10z"></path></svg>
+                    <span>Copiar</span>
+                </button>
+            </div>
+            <div id="classification-result"></div>
+            <div id="suggested-response"></div>
         </div>
     </div>
+
+    <div id="notification" class="hidden"></div>
 
     <script src="script.js"></script>
 </body>

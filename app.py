@@ -27,19 +27,23 @@ except Exception as e:
 # --- PROMPT ESTRUTURADO PARA O GEMINI ---
 # Este prompt é a nova "inteligência" do nosso app.
 # Ele instrui o Gemini a agir como um assistente e retornar um JSON.
+# Dentro da string PROMPT_TEMPLATE em app.py
+
 PROMPT_TEMPLATE = """
 Analise o seguinte e-mail e retorne um objeto JSON com a seguinte estrutura:
 {{
   "classification": "...",
   "summary": "...",
   "suggested_response": "...",
-  "priority": "..."
+  "priority": "...",
+  "sentiment": "..." 
 }}
 
 - "classification": Classifique o e-mail em uma das seguintes categorias: 'Solicitação Urgente', 'Dúvida Técnica', 'Comercial', 'Feedback', 'Agradecimento', 'Outros'.
 - "summary": Um resumo de uma frase do conteúdo do e-mail.
 - "suggested_response": Uma resposta adequada e profissional, em português, baseada no conteúdo do e-mail.
 - "priority": A prioridade da resposta, classificada como 'Alta', 'Média' ou 'Baixa'.
+- "sentiment": O sentimento geral do e-mail, classificado como 'Positivo', 'Neutro' ou 'Negativo'.
 
 Não inclua ```json ou ``` no início ou no fim da sua resposta. Responda apenas com o JSON.
 

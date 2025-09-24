@@ -1,75 +1,153 @@
-// 1. Pega as referências dos elementos HTML que vamos usar
-const emailInput = document.getElementById('email-input');
-const classifyBtn = document.getElementById('classify-btn');
-const resultsContainer = document.getElementById('results-container');
-const classificationResult = document.getElementById('classification-result');
-const suggestedResponse = document.getElementById('suggested-response');
+document.addEventListener('DOMContentLoaded', () => {
+    ('Página carregada e script iniciado.'); // LOG 1
 
-// URL da nossa API Flask que está rodando localmente
-const API_URL = '/classify'; 
+    // --- ELEMENTOS DO DOM ---
+    const emailInput = document.getElementById('email-input');
+    const classifyBtn = document.getElementById('classify-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const resultsContainer = document.getElementById('results-container');
+    const classificationResult = document.getElementById('classification-result');
+    const suggestedResponse = document.getElementById('suggested-response');
+    const copyBtn = document.getElementById('copy-btn');
+    const notification = document.getElementById('notification');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const exampleBtns = document.querySelectorAll('.example-btn');
 
-// 2. Adiciona um "escutador de eventos" ao botão de classificar
-classifyBtn.addEventListener('click', async () => {
-    const emailText = emailInput.value;
+    const btnText = classifyBtn.querySelector('.btn-text');
+    const spinner = classifyBtn.querySelector('.spinner');
 
-    // Validação simples para não enviar texto vazio
-    if (!emailText.trim()) {
-        alert('Por favor, insira o texto de um e-mail.');
-        return;
-    }
+    const API_URL = '/classify';
 
-    // 3. Feedback visual para o usuário enquanto a IA processa
-    classifyBtn.disabled = true;
-    classifyBtn.textContent = 'Classificando...';
-    resultsContainer.classList.add('hidden');
+    // ... (O resto do código de exemplos e tema continua igual) ...
+    const examples = {
+        urgent: `Olá equipe,\n\nEstou escrevendo pois nosso sistema de pagamentos está fora do ar e não conseguimos processar nenhuma venda há mais de 30 minutos. Nossos clientes estão reclamando.\n\nPrecisamos de uma solução urgente!\n\nAtt,\nJoão Silva`,
+        thanks: `Oi Maria,\n\nSó passando para agradecer pela ajuda com o relatório hoje. Você salvou meu dia!\n\nMuito obrigado!\n\nAbraço,\nCarlos`,
+        spam: `PARABÉNS! Você foi selecionado para uma oferta imperdível! Clique aqui e ganhe 90% de desconto em nossos produtos. Não perca tempo, é por tempo limitado! Compre agora!`
+    };
 
-    try {
-        // 4. A chamada para a nossa API (o "pulo do gato")
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email_text: emailText }),
-        });
-
-        // Pega a resposta JSON do servidor
-        const data = await response.json();
-
-        // Se a resposta do servidor não for um sucesso (ex: erro 500)
-        if (!response.ok) {
-            // Mostra o erro que o nosso backend retornou
-            throw new Error(data.error || 'Ocorreu um erro na API.');
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
         }
+    };
 
-        // 5. Mostra os resultados na tela
-        displayResults(data);
+    themeToggleBtn.addEventListener('click', () => {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const newTheme = isDarkMode ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+    });
 
-    } catch (error) {
-        // Se der qualquer erro de conexão ou na API, mostra um alerta
-        console.error('Erro ao classificar:', error);
-        alert(`Falha na classificação: ${error.message}`);
-    } finally {
-        // 6. Reseta o botão para o estado original, independente de sucesso ou falha
-        classifyBtn.disabled = false;
-        classifyBtn.textContent = 'Classificar E-mail';
-    }
-});
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
 
-function displayResults(data) {
-    // Agora 'data' tem os campos: classification, summary, suggested_response, priority
+
+    // --- LÓGICA PRINCIPAL ---
+    const showLoading = (isLoading) => {
+        if (isLoading) {
+            btnText.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            classifyBtn.disabled = true;
+        } else {
+            btnText.classList.remove('hidden');
+            spinner.classList.add('hidden');
+            classifyBtn.disabled = false;
+        }
+    };
     
-    // Atualiza o HTML com os novos dados
+    const showNotification = (message) => {
+        ('Mostrando notificação:', message); // LOG 2
+        notification.textContent = message;
+        notification.classList.remove('hidden');
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    };
+
+    const displayResults = (data) => {
+    // Objeto para mapear o nome do sentimento para o ícone
+    const sentimentIcons = {
+        'Positivo': '😊',
+        'Neutro': '😐',
+        'Negativo': '😠'
+    };
+
+    // Atualiza a linha da classificação para incluir o ícone de sentimento
     classificationResult.innerHTML = `
-        <span class="tag tag-${data.priority.toLowerCase()}">${data.priority}</span> ${data.classification}
+        <span class="tag tag-${data.priority.toLowerCase()}">${data.priority}</span> 
+        ${data.classification}
+        <span class="sentiment" title="Sentimento: ${data.sentiment}">${sentimentIcons[data.sentiment] || ''}</span>
     `;
-    
-    // Adicionamos um novo campo para o resumo
+
+    // A parte da sugestão de resposta continua igual
     suggestedResponse.innerHTML = `
         <strong>Resumo:</strong> ${data.summary}<br><br>
         <strong>Sugestão de Resposta:</strong><br>
-        ${data.suggested_response.replace(/\n/g, '<br>')}
-    `;
+        <span id="response-text">${data.suggested_response.replace(/\n/g, '<br>')}</span>`;
     
-    resultsContainer.classList.remove('hidden');
-}
+    // Mostra o container de resultados
+    resultsContainer.classList.add('visible');
+    };
+
+    classifyBtn.addEventListener('click', async () => {
+        ('Botão "Classificar" clicado!'); // LOG 5
+        const emailText = emailInput.value;
+        if (!emailText.trim()) {
+            showNotification('Por favor, insira o texto de um e-mail.');
+            return;
+        }
+
+        showLoading(true);
+        resultsContainer.classList.remove('visible');
+
+        try {
+            ('Iniciando chamada para a API...'); // LOG 6
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email_text: emailText }),
+            });
+            
+            ('Resposta da API recebida. Status:', response.status); // LOG 7
+            const data = await response.json();
+            ('Dados da API (em formato JSON):', data); // LOG 8
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Ocorreu um erro na API.');
+            }
+            displayResults(data);
+
+        } catch (error) {
+            console.error('--- ERRO CAPTURADO ---', error); // LOG 9 - ERRO
+            showNotification(`Falha na classificação: ${error.message}`);
+        } finally {
+            showLoading(false);
+            ('Execução finalizada (bloco finally).'); // LOG 10
+        }
+    });
+
+    // ... (O resto do código de clear, copy e examples continua igual) ...
+    clearBtn.addEventListener('click', () => {
+        emailInput.value = '';
+        resultsContainer.classList.remove('visible');
+    });
+
+    copyBtn.addEventListener('click', () => {
+        const responseTextElement = document.getElementById('response-text');
+        if (responseTextElement) {
+            navigator.clipboard.writeText(responseTextElement.innerText)
+                .then(() => showNotification('Resposta copiada para a área de transferência!'))
+                .catch(err => showNotification('Falha ao copiar texto.'));
+        }
+    });
+    
+    exampleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const exampleType = btn.dataset.example;
+            emailInput.value = examples[exampleType];
+        });
+    });
+});
