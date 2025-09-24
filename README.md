@@ -89,12 +89,4 @@ Siga os passos abaixo para rodar a aplicação na sua máquina.
 
 ---
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-Desenvolvido por **Guilherme Lucas Teixeira**.
-=======
-Desenvolvido por **Guilherme Lucas Teixeira Silva**.
->>>>>>> Stashed changes
-=======
-Desenvolvido por **Guilherme Lucas Teixeira Silva**.
->>>>>>> Stashed changes
+Desenvolvido por **[Seu Nome Completo aqui]**.
