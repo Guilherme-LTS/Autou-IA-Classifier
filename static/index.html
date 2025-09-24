@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoU - Classificador de E-mails</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Classificador de E-mails com IA</h1>
+        <p class="subtitle">Cole o texto de um e-mail abaixo para classificá-lo como produtivo ou improdutivo e receber uma sugestão de resposta.</p>
+
+        <div class="form-group">
+            <textarea id="email-input" rows="10" placeholder="Cole o conteúdo do e-mail aqui..."></textarea>
+        </div>
+
+        <button id="classify-btn">Classificar E-mail</button>
+
+        <div id="results-container" class="hidden">
+            <h2>Resultado da Análise</h2>
+            <p><strong>Classificação:</strong> <span id="classification-result"></span></p>
+            <h3>Sugestão de Resposta:</h3>
+            <p id="suggested-response"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
