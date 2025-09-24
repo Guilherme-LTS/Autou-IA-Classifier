@@ -89,4 +89,4 @@ Siga os passos abaixo para rodar a aplicação na sua máquina.
 
 ---
 
-Desenvolvido por **[Seu Nome Completo aqui]**.
+Desenvolvido por **Guilherme Lucas Teixeira Silva**.
