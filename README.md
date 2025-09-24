@@ -44,15 +44,15 @@ Este projeto foi construído utilizando as seguintes tecnologias:
 Siga os passos abaixo para rodar a aplicação na sua máquina.
 
 **Pré-requisitos:**
-* Python 3.x instalado.
+* Python 3.13.4 instalado.
 * Git instalado.
 
 **Passos:**
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/](https://github.com/)[SEU_USUARIO_GITHUB]/[NOME_DO_REPOSITORIO].git
-    cd [NOME_DO_REPOSITORIO]
+    git clone https://github.com/Guilherme-LTS/Autou-IA-Classifier.git
+    cd Autou-IA-Classifier
     ```
 
 2.  **Crie e ative um ambiente virtual:**
